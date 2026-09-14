@@ -49,6 +49,8 @@ Instead of relying on fragile pixel coordinates, WinPilot harnesses the **Micros
 └─────────────────────────────────────────────────────────┘
 ```
 
+For the comprehensive technical specification, roadmap, and gap analysis, see [`docs/ACTION_PLAN.md`](docs/ACTION_PLAN.md).
+
 ---
 
 ## Installation
