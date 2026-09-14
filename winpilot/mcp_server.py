@@ -5,7 +5,10 @@ Exposes rich Windows UI automation, window management, and recipe tools to AI ag
 
 from __future__ import annotations
 
+import datetime
 import json
+import time
+from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
@@ -119,13 +122,64 @@ def capture_screenshot(hwnd_or_title: str | None = None) -> str:
             w = find_window(title_regex=hwnd_or_title)
         if not w or not w.is_valid:
             return f"Error: Window '{hwnd_or_title}' not found."
-        img = Screen.capture_window(w)
+        img, meta = Screen.capture_window(w)
     else:
-        img = Screen.capture_desktop()
+        img, meta = Screen.capture_desktop()
 
     if not img:
         return "Error: Failed to capture screenshot."
-    return Screen.to_base64(img)
+    return json.dumps({
+        "status": "success",
+        "target_type": meta.target_type,
+        "target_name": meta.target_name,
+        "hwnd": meta.hwnd,
+        "pid": meta.pid,
+        "process_name": meta.process_name,
+        "resolution": meta.dimensions,
+        "engine": meta.engine,
+        "base64_png": Screen.to_base64(img),
+    })
+
+
+@mcp.tool()
+def record_screen(hwnd_or_title: str | None = None, duration_seconds: float = 3.0, fps: int = 10) -> str:
+    """
+    Record desktop or target window video silently.
+    Returns JSON metadata with the saved recording path and duration.
+    """
+    from winpilot.core.screen import ScreenRecorder
+
+    w = None
+    if hwnd_or_title:
+        if hwnd_or_title.isdigit():
+            w = Window(int(hwnd_or_title))
+        else:
+            w = find_window(title_regex=hwnd_or_title)
+        if not w or not w.is_valid:
+            return f"Error: Window '{hwnd_or_title}' not found."
+
+    recorder = ScreenRecorder(target_window=w, fps=fps)
+    recorder.start()
+    time.sleep(duration_seconds)
+    recorder.stop()
+
+    if recorder.frame_count == 0:
+        return "Error: No frames were captured during recording."
+
+    ts = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    prefix = f"Recording_{Path(w.process_name).stem}" if (w and w.process_name) else "Recording_Desktop"
+    out_file = Screen.get_default_screenshots_dir() / f"{prefix}_{ts}.mp4"
+    saved = recorder.save(out_file)
+
+    return json.dumps({
+        "status": "success",
+        "target": w.title if w else "Full Desktop",
+        "hwnd": w.hwnd if w else None,
+        "duration_seconds": recorder.elapsed_seconds,
+        "frame_count": recorder.frame_count,
+        "file_path": str(saved),
+    }, indent=2)
+
 
 
 @mcp.tool()

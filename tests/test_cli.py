@@ -38,3 +38,29 @@ def test_window_geometry_math():
     with patch.object(Window, "is_valid", False):
         assert w.width == 0
         assert w.height == 0
+
+
+def test_cli_screenshot():
+    from pathlib import Path
+
+    from winpilot.core.screen import CaptureMetadata
+
+    meta = CaptureMetadata(
+        target_type="desktop",
+        target_name="Full Desktop (All Screens)",
+        hwnd=None,
+        pid=None,
+        process_name=None,
+        bounds=(0, 0, 1920, 1080),
+        dimensions=(1920, 1080),
+        engine="Win32 GDI BitBlt",
+        timestamp="2026-09-14 12:00:00",
+        file_path=Path("dummy_shot.png"),
+    )
+
+    with patch("winpilot.core.screen.Screen.capture_to_file", return_value=(Path("dummy_shot.png"), meta)):
+        result = runner.invoke(app, ["screenshot"])
+        assert result.exit_code == 0
+        assert "Direct Silent Screenshot" in result.output
+        assert "dummy_shot.png" in result.output
+

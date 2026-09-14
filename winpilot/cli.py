@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from pathlib import Path
 
 if sys.platform == "win32":
@@ -163,22 +164,108 @@ def paste_cmd(
 
 @app.command("screenshot")
 def screenshot_cmd(
-    window: str | None = typer.Option(None, "--window", "-w", help="Window title or HWND (defaults to full screen)"),
-    output: Path = typer.Option(Path("screenshot.png"), "--output", "-o", help="Output PNG path"),
+    window: str | None = typer.Option(None, "--window", "-w", help="Target window title, regex, or HWND (defaults to full desktop)"),
+    output: Path | None = typer.Option(None, "--output", "-o", help="Output PNG path (defaults to Windows Screenshots folder)"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress verbose state panel"),
 ):
-    """Capture a screenshot of a window or desktop."""
-    if window:
-        w = _resolve_window(window)
-        img = Screen.capture_window(w)
-    else:
-        img = Screen.capture_desktop()
+    """
+    Direct, silent screenshot capture (Win+PrtScn style).
+    Saves to the Windows Screenshots directory without any OS popup or dialog.
+    """
+    from rich.panel import Panel
 
-    if not img:
+    w = _resolve_window(window) if window else None
+    saved_path, meta = Screen.capture_to_file(w, dest_path=output)
+
+    if not saved_path:
         console.print("[bold red]Error:[/] Failed to capture screenshot.")
         raise typer.Exit(code=1)
 
-    saved_path = Screen.save(img, output)
-    console.print(f"[bold green]✓[/] Screenshot saved to: [cyan]{saved_path}[/]")
+    if not quiet:
+        details = (
+            f"[bold cyan]Operation:[/]     [white]Direct Silent Screenshot (Win+PrtScn)[/]\n"
+            f"[bold cyan]Target Type:[/]   [yellow]{meta.target_type.upper()}[/]\n"
+            f"[bold cyan]Target Name:[/]   [white]{meta.target_name}[/]\n"
+        )
+        if meta.hwnd:
+            details += (
+                f"[bold cyan]Window HWND:[/]   [magenta]{meta.hwnd}[/] (PID: {meta.pid})\n"
+                f"[bold cyan]Process:[/]       [white]{meta.process_name or 'N/A'}[/]\n"
+            )
+        details += (
+            f"[bold cyan]Bounds (L,T,R,B):[/] [dim]{meta.bounds}[/]\n"
+            f"[bold cyan]Resolution:[/]    [green]{meta.dimensions[0]}x{meta.dimensions[1]}[/] px\n"
+            f"[bold cyan]Capture Engine:[/] [white]{meta.engine}[/]\n"
+            f"[bold cyan]Destination:[/]   [bold green]{saved_path}[/]"
+        )
+        console.print(Panel(details, title="📸 [bold green]WinPilot Capture Telemetry[/]", expand=False))
+    else:
+        console.print(f"[bold green]✓[/] {saved_path}")
+
+
+@app.command("record")
+def record_cmd(
+    window: str | None = typer.Option(None, "--window", "-w", help="Target window title, regex, or HWND (defaults to full desktop)"),
+    duration: float | None = typer.Option(None, "--duration", "-d", help="Recording duration in seconds (defaults to interactive)"),
+    fps: int = typer.Option(15, "--fps", "-f", help="Capture frames per second (1-60)"),
+    output: Path | None = typer.Option(None, "--output", "-o", help="Output file path (.mp4 or .gif)"),
+):
+    """
+    Record desktop or target window video with live telemetry.
+    Press Ctrl+C or Enter to stop interactive recording.
+    """
+    import datetime
+
+    from rich.live import Live
+    from rich.panel import Panel
+
+    from winpilot.core.screen import ScreenRecorder
+
+    w = _resolve_window(window) if window else None
+    target_desc = f"Window: '{w.title}' (HWND: {w.hwnd}, PID: {w.pid})" if w else "Full Desktop (All Displays)"
+
+    if output is None:
+        ts = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        prefix = f"Recording_{Path(w.process_name).stem}" if (w and w.process_name) else "Recording_Desktop"
+        output = Screen.get_default_screenshots_dir() / f"{prefix}_{ts}.mp4"
+
+    recorder = ScreenRecorder(target_window=w, fps=fps)
+
+    def _render_panel(status: str) -> Panel:
+        body = (
+            f"[bold cyan]Status:[/]       {status}\n"
+            f"[bold cyan]Target:[/]       [white]{target_desc}[/]\n"
+            f"[bold cyan]Elapsed:[/]      [yellow]{recorder.elapsed_seconds:.1f}s[/]"
+            + (f" / {duration:.1f}s" if duration else " (Press Ctrl+C or Enter to stop)") + "\n"
+            f"[bold cyan]Frames:[/]       [green]{recorder.frame_count}[/] frames "
+            f"([dim]~{recorder.current_fps:.1f} FPS[/])\n"
+            f"[bold cyan]Output:[/]       [white]{output}[/]"
+        )
+        return Panel(body, title="⏺ [bold red]WinPilot Video Recording[/]", expand=False)
+
+    recorder.start()
+
+    with Live(_render_panel("[bold green]● Recording[/]"), refresh_per_second=4, console=console) as live:
+        try:
+            start_time = time.time()
+            while True:
+                time.sleep(0.25)
+                live.update(_render_panel("[bold green]● Recording[/]"))
+                if duration and (time.time() - start_time) >= duration:
+                    break
+        except KeyboardInterrupt:
+            pass
+
+    console.print("[*] Finalizing and encoding recording...")
+    recorder.stop()
+
+    if recorder.frame_count == 0:
+        console.print("[bold red]Error:[/] No frames captured.")
+        raise typer.Exit(code=1)
+
+    saved_file = recorder.save(output)
+    console.print(f"[bold green]✓[/] Recording successfully saved to: [bold cyan]{saved_file}[/]")
+
 
 
 @app.command("serve")

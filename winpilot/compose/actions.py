@@ -98,6 +98,15 @@ class ActionChain:
         self._actions.append(_act)
         return self
 
+    def screenshot(self, output_path: str | None = None) -> ActionChain:
+        """Capture a silent screenshot of the target window."""
+        from winpilot.core.screen import Screen
+
+        def _act():
+            Screen.capture_to_file(self.window, dest_path=output_path)
+        self._actions.append(_act)
+        return self
+
     def custom(self, func: Callable[[], Any]) -> ActionChain:
         self._actions.append(func)
         return self
@@ -110,3 +119,4 @@ class ActionChain:
             return True
         except Exception as e:
             raise e
+
