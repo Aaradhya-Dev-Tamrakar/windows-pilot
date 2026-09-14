@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "winpilot"
+version = "0.1.0"
+description = "Windows UI Automation & Control Toolkit for AI Agents (MCP) and Humans (CLI/SDK)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Aaradhya Dev Tamrakar", email = "aaradhyadevtmr@gmail.com" }
+]
+keywords = ["windows", "ui-automation", "mcp", "ai-agents", "rpa", "desktop-automation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Testing",
+]
+
+dependencies = [
+    "pywin32>=306",
+    "comtypes>=1.4.0",
+    "pywinauto>=0.6.8",
+    "Pillow>=10.0.0",
+    "typer[all]>=0.12.0",
+    "rich>=13.7.0",
+    "mcp>=1.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=24.0.0",
+    "ruff>=0.4.0",
+]
+
+[project.scripts]
+winpilot = "winpilot.cli:app"
+winpilot-mcp = "winpilot.mcp_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["winpilot"]
