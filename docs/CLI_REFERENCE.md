@@ -97,15 +97,45 @@ winpilot paste "Claude" "Explain how quantum entanglement works" --submit
 ---
 
 ### `winpilot screenshot`
-Capture a screenshot of a specific window or the entire desktop display.
+Direct, silent screenshot capture (Win+PrtScn style). Automatically saves to the user's default Windows Screenshots directory without any OS popup, Snipping Tool overlay, or audio chime.
 
 ```powershell
-# Screenshot specific application window
+# Default: Silent full desktop screenshot saved to Screenshots folder
+winpilot screenshot
+
+# Capture a specific window by title regex or HWND
+winpilot screenshot --window "Notepad"
+winpilot screenshot -w 727336
+
+# Override output path
 winpilot screenshot --window "Claude" --output "claude_screen.png"
 
-# Screenshot entire virtual screen
-winpilot screenshot --output "full_desktop.png"
+# Suppress verbose telemetry panel
+winpilot screenshot --quiet
 ```
+
+**Verbose Telemetry Displayed**:
+- Operation type, target name, window HWND, PID, process name, coordinate bounds, resolution, capture engine (`Win32 GDI BitBlt`), and saved destination path.
+
+---
+
+### `winpilot record`
+Record desktop or target window video with live terminal telemetry.
+
+```powershell
+# Record full desktop interactively (press Ctrl+C or Enter to stop)
+winpilot record
+
+# Record a specific application window for 5 seconds at 20 FPS
+winpilot record --window "Notepad" --duration 5 --fps 20 --output "notepad_demo.mp4"
+
+# Record directly to an animated GIF
+winpilot record --window "Claude" --duration 3 --output "claude_flow.gif"
+```
+
+**Live Telemetry Dashboard**:
+- Live updating Rich panel reporting current status (`● Recording`), target details, elapsed time vs limit, captured frame count, active real-time FPS, and output destination.
+
 
 ---
 

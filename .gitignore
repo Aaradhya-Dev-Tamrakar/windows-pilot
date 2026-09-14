@@ -55,9 +55,15 @@ cover/
 *.mo
 *.pot
 
-# Django stuff:
 *.log
 local_settings.py
+
+# Media / Recordings
+*.mp4
+*.gif
+demo_recording.mp4
+test_recording.mp4
+
 db.sqlite3
 db.sqlite3-journal
 

@@ -98,7 +98,16 @@ graph TB
 
 ---
 
-### Phase 2: Expansion & Visual Tooling (PLANNED)
+### Phase 2: Expansion & Visual Tooling (IN PROGRESS)
+- [x] **Silent Screen & Window Capture (Win+PrtScn Style)**:
+  - Native Win32 GDI `BitBlt` with `CAPTUREBLT` and DPI-aware virtual desktop metrics. Zero OS popups, toasts, or chimes.
+  - Automatic detection of standard Windows `Screenshots` folder (OneDrive/registry redirected).
+  - Target window capture with `PrintWindow` fallback for occluded/offscreen windows.
+  - Verbose terminal telemetry panel with target name, HWND, PID, process, bounds, resolution, and engine.
+- [x] **Desktop & Window Screen Recorder (`ScreenRecorder`)**:
+  - Multi-threaded background frame recording engine tracking full desktop or target window HWND.
+  - Dual encoders: H.264 `.mp4` video (via system `ffmpeg`) and pure Pillow animated `.gif` fallback.
+  - Interactive CLI `winpilot record` command with live terminal dashboard showing real-time duration, FPS, and frame count.
 - [ ] **GUI Automation Builder & Live Inspector (`winpilot/gui/`)**:
   - Tkinter-based desktop GUI (zero extra system dependencies on Windows).
   - Live element picker: hover over any application window to highlight its UIA bounding box and display its selector.
@@ -111,6 +120,7 @@ graph TB
   - `file_dialog.py`: Universal Open/Save dialog path typing and confirmation.
 - [ ] **OCR Fallback**:
   - Windows OCR (via `WinRT` / `Windows.Media.Ocr`) or Tesseract fallback for apps with sparse accessibility trees (legacy Win32, custom Canvas games, Direct3D).
+
 
 ---
 

@@ -73,18 +73,27 @@ Dispatches hardware keystrokes and key combinations to the target window.
   - `keys_combo` (required, string): Key combination string (e.g. `"ctrl+n"`, `"alt+f4"`, `"esc"`, `"enter"`).
 
 ### 7. `capture_screenshot`
-Captures a high-resolution screenshot of the target window (or full screen) and returns a base64-encoded PNG image.
+Captures a high-resolution, silent screenshot of the target window (or full screen) without triggering any OS popup or sound. Returns structured JSON containing target metadata (`target_name`, `hwnd`, `pid`, `process_name`, `bounds`, `resolution`, `engine`) along with a base64-encoded PNG image.
 - **Parameters**:
   - `hwnd_or_title` (optional, string): Target window. Omit for full desktop screenshot.
 - **Agent Usage**: Ideal for multimodal verification, checking visual layout changes, or analyzing applications with sparse accessibility trees.
 
-### 8. `run_recipe`
+### 8. `record_screen`
+Silently records a video sequence of the desktop or a specific target window for a given duration.
+- **Parameters**:
+  - `hwnd_or_title` (optional, string): Target window title or HWND. Omit for full desktop.
+  - `duration_seconds` (optional, float, default `3.0`): Recording duration in seconds.
+  - `fps` (optional, integer, default `10`): Frame rate.
+- **Agent Usage**: Use this to capture dynamic UI animations, measure load transitions, or record workflow runs for agent evaluation.
+
+### 9. `run_recipe`
 Executes an established application recipe workflow.
 - **Parameters**:
   - `recipe_name` (required, string): Name of recipe (e.g. `"claude_desktop"`).
   - `action` (required, string): Recipe action (e.g. `"set_model"`, `"send_prompt"`).
   - `target` (optional, string, default `"Claude"`): Target window.
   - `params_json` (optional, string): JSON-encoded dictionary of action parameters.
+
 
 ---
 

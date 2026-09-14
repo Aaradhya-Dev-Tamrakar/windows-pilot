@@ -108,12 +108,17 @@ winpilot click "Claude" "Button[Name*='Model']"
 # Paste text safely using Unicode clipboard injection
 winpilot paste "Claude" "Explain how quantum entanglement works" --submit
 
-# Take a screenshot
+# Take a direct silent screenshot (Win+PrtScn style, zero popups)
+winpilot screenshot
 winpilot screenshot --window "Claude" --output "claude.png"
+
+# Record screen or target window video with live telemetry
+winpilot record --window "Claude" --duration 5 --output "claude_demo.mp4"
 
 # Run Claude Desktop model switcher recipe
 winpilot recipe claude-model --model "haiku"
 ```
+
 
 For the complete CLI manual, see [`docs/CLI_REFERENCE.md`](docs/CLI_REFERENCE.md).
 
