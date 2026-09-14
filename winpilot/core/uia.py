@@ -7,13 +7,12 @@ from __future__ import annotations
 import re
 import sys
 import time
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 from winpilot.core.input import Input
 from winpilot.core.window import Window, attach_default_desktop
 
 if sys.platform == "win32":
-    import pywinauto
     from pywinauto.controls.uiawrapper import UIAWrapper
     from pywinauto.uia_element_info import UIAElementInfo
 
@@ -67,7 +66,7 @@ class UIElement:
             return 0
 
     @property
-    def rect(self) -> Tuple[int, int, int, int]:
+    def rect(self) -> tuple[int, int, int, int]:
         """Returns (left, top, right, bottom) bounding rectangle."""
         try:
             r = self._info.rectangle
@@ -76,7 +75,7 @@ class UIElement:
             return (0, 0, 0, 0)
 
     @property
-    def center(self) -> Tuple[int, int]:
+    def center(self) -> tuple[int, int]:
         l, t, r, b = self.rect
         return (l + (r - l) // 2, t + (b - t) // 2)
 
@@ -150,21 +149,21 @@ class UIElement:
         time.sleep(0.05)
         return Input.paste_text(text)
 
-    def children(self) -> List[UIElement]:
+    def children(self) -> list[UIElement]:
         """Get direct child elements."""
         try:
             return [UIElement(c) for c in self._info.children()]
         except Exception:
             return []
 
-    def descendants(self, depth: int = 10) -> List[UIElement]:
+    def descendants(self, depth: int = 10) -> list[UIElement]:
         """Get all descendant elements up to depth."""
         try:
             return [UIElement(d) for d in self._info.descendants(depth=depth)]
         except Exception:
             return []
 
-    def to_dict(self, include_children: bool = False, max_depth: int = 2) -> Dict[str, Any]:
+    def to_dict(self, include_children: bool = False, max_depth: int = 2) -> dict[str, Any]:
         """Converts element info into a clean dictionary for MCP and CLI outputs."""
         data = {
             "name": self.name,
@@ -190,7 +189,7 @@ class UIElement:
 class UIATree:
     """UI Automation Tree explorer for a specific Window or root element."""
 
-    def __init__(self, root: Union[Window, int, UIElement]):
+    def __init__(self, root: Window | int | UIElement):
         attach_default_desktop()
         if isinstance(root, Window):
             self.hwnd = root.hwnd
@@ -204,11 +203,11 @@ class UIATree:
         else:
             raise ValueError(f"Invalid root: {root}")
 
-    def dump_tree(self, max_depth: int = 3, visible_only: bool = True) -> Dict[str, Any]:
+    def dump_tree(self, max_depth: int = 3, visible_only: bool = True) -> dict[str, Any]:
         """Dumps a hierarchical representation of the UIA tree."""
         attach_default_desktop()
 
-        def _traverse(elem: UIElement, depth: int) -> Optional[Dict[str, Any]]:
+        def _traverse(elem: UIElement, depth: int) -> dict[str, Any] | None:
             if visible_only and not elem.is_visible:
                 # If root, still show
                 if depth > 0:
@@ -233,16 +232,16 @@ class UIATree:
 
     def find_all(
         self,
-        name: Optional[str] = None,
-        name_regex: Optional[str] = None,
-        control_type: Optional[str] = None,
-        automation_id: Optional[str] = None,
+        name: str | None = None,
+        name_regex: str | None = None,
+        control_type: str | None = None,
+        automation_id: str | None = None,
         max_depth: int = 8,
         visible_only: bool = False,
-    ) -> List[UIElement]:
+    ) -> list[UIElement]:
         """Finds all descendant elements matching the criteria."""
         attach_default_desktop()
-        results: List[UIElement] = []
+        results: list[UIElement] = []
         name_pattern = re.compile(name_regex, re.IGNORECASE) if name_regex else None
         target_name = name.lower() if name else None
         target_type = control_type.lower() if control_type else None
@@ -265,13 +264,13 @@ class UIATree:
 
     def find_one(
         self,
-        name: Optional[str] = None,
-        name_regex: Optional[str] = None,
-        control_type: Optional[str] = None,
-        automation_id: Optional[str] = None,
+        name: str | None = None,
+        name_regex: str | None = None,
+        control_type: str | None = None,
+        automation_id: str | None = None,
         max_depth: int = 8,
         visible_only: bool = False,
-    ) -> Optional[UIElement]:
+    ) -> UIElement | None:
         """Finds the first matching element."""
         elems = self.find_all(
             name=name,

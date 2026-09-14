@@ -1,0 +1,39 @@
+name: Bug Report
+description: Report an unexpected error, crash, or automation failure in WinPilot
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Please ensure you have checked the [Safety Directives](docs/SAFETY_DIRECTIVES.md) and searched existing issues.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS version, Python version, and WinPilot version
+      placeholder: e.g. Windows 11 23H2, Python 3.12.3, winpilot 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: Minimal code snippet or CLI command demonstrating the issue.
+      placeholder: |
+        1. winpilot list
+        2. winpilot click "Window" "Button[Name='Ok']"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Error Traceback
+      description: Paste any error messages or tracebacks here.
+      render: shell

@@ -5,10 +5,7 @@ Exposes rich Windows UI automation, window management, and recipe tools to AI ag
 
 from __future__ import annotations
 
-import asyncio
 import json
-from typing import Any, Dict, List, Optional
-import sys
 
 from mcp.server.fastmcp import FastMCP
 
@@ -17,15 +14,15 @@ from winpilot.core.input import Input
 from winpilot.core.screen import Screen
 from winpilot.core.uia import UIATree
 from winpilot.core.window import Window, find_window, list_windows
-from winpilot.recipes.claude_desktop import ClaudeDesktopRecipe, get_all_claude_instances
+from winpilot.recipes.claude_desktop import ClaudeDesktopRecipe
 
 mcp = FastMCP("winpilot")
 
 
 @mcp.tool()
 def list_desktop_windows(
-    title_regex: Optional[str] = None,
-    process_name: Optional[str] = None,
+    title_regex: str | None = None,
+    process_name: str | None = None,
     visible_only: bool = True,
 ) -> str:
     """List open Windows top-level windows matching title or process filters."""
@@ -113,7 +110,7 @@ def send_keys(keys_combo: str) -> str:
 
 
 @mcp.tool()
-def capture_screenshot(hwnd_or_title: Optional[str] = None) -> str:
+def capture_screenshot(hwnd_or_title: str | None = None) -> str:
     """Capture a screenshot of a window or full desktop and return base64 encoded PNG."""
     if hwnd_or_title:
         if hwnd_or_title.isdigit():

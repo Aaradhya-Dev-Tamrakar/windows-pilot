@@ -1,7 +1,8 @@
 """Tests for WinPilot Selector parser and Query DSL."""
 
 from unittest.mock import MagicMock
-from winpilot.compose.query import Query, parse_query, Selector
+
+from winpilot.compose.query import Selector, parse_query
 
 
 def test_parse_simple_selector():

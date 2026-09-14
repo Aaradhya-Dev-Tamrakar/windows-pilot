@@ -86,8 +86,10 @@ function Get-WinPilotScope {
     if ($ChangedFiles | Where-Object { $_ -match 'winpilot/cli' }) { return "cli" }
     if ($ChangedFiles | Where-Object { $_ -match 'winpilot/compose/' }) { return "compose" }
     if ($ChangedFiles | Where-Object { $_ -match 'winpilot/core/' }) { return "core" }
-    if ($ChangedFiles | Where-Object { $_ -match 'README\.md|docs/' }) { return "docs" }
-    if ($ChangedFiles | Where-Object { $_ -match 'pyproject\.toml|sync\.ps1' }) { return "config" }
+    if ($ChangedFiles | Where-Object { $_ -match 'docs/SAFETY_DIRECTIVES' }) { return "safety" }
+    if ($ChangedFiles | Where-Object { $_ -match 'README\.md|docs/|AGENTS\.md|CONTRIBUTING\.md' }) { return "docs" }
+    if ($ChangedFiles | Where-Object { $_ -match '\.github/' }) { return "ci" }
+    if ($ChangedFiles | Where-Object { $_ -match 'pyproject\.toml|sync\.ps1|\.editorconfig' }) { return "config" }
     return "general"
 }
 

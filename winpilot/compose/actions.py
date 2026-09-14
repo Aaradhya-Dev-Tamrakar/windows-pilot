@@ -5,9 +5,9 @@ Action Chains: Composable, fluent automation pipelines with automatic retry and 
 from __future__ import annotations
 
 import time
-from typing import Any, Callable, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
-from winpilot.compose.query import Query
 from winpilot.compose.wait import wait_for_element, wait_until_gone
 from winpilot.core.input import Input
 from winpilot.core.uia import UIATree, UIElement
@@ -17,11 +17,11 @@ from winpilot.core.window import Window
 class ActionChain:
     """Fluent action pipeline builder for automating a window."""
 
-    def __init__(self, window_or_hwnd: Union[Window, int]):
+    def __init__(self, window_or_hwnd: Window | int):
         self.window = window_or_hwnd if isinstance(window_or_hwnd, Window) else Window(window_or_hwnd)
         self.tree = UIATree(self.window)
-        self._actions: List[Callable[[], Any]] = []
-        self._last_element: Optional[UIElement] = None
+        self._actions: list[Callable[[], Any]] = []
+        self._last_element: UIElement | None = None
 
     def focus(self) -> ActionChain:
         def _act():
@@ -41,7 +41,7 @@ class ActionChain:
         self._actions.append(_act)
         return self
 
-    def click(self, query_str: Optional[str] = None, method: str = "auto", timeout: float = 5.0) -> ActionChain:
+    def click(self, query_str: str | None = None, method: str = "auto", timeout: float = 5.0) -> ActionChain:
         def _act():
             if query_str:
                 elem = wait_for_element(self.tree, query_str, timeout=timeout)
@@ -54,7 +54,7 @@ class ActionChain:
         self._actions.append(_act)
         return self
 
-    def type_text(self, text: str, query_str: Optional[str] = None, delay: float = 0.01) -> ActionChain:
+    def type_text(self, text: str, query_str: str | None = None, delay: float = 0.01) -> ActionChain:
         def _act():
             if query_str:
                 elem = wait_for_element(self.tree, query_str)
@@ -64,7 +64,7 @@ class ActionChain:
         self._actions.append(_act)
         return self
 
-    def paste(self, text: str, query_str: Optional[str] = None, submit_enter: bool = False) -> ActionChain:
+    def paste(self, text: str, query_str: str | None = None, submit_enter: bool = False) -> ActionChain:
         def _act():
             if query_str:
                 elem = wait_for_element(self.tree, query_str)

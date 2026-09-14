@@ -5,14 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "winpilot"
 version = "0.1.0"
-description = "Windows UI Automation & Control Toolkit for AI Agents (MCP) and Humans (CLI/SDK)"
+description = "Mission-Critical Windows Desktop Automation Toolkit for AI Agents (MCP) and Humans (CLI/SDK)"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
     { name = "Aaradhya Dev Tamrakar", email = "aaradhyadevtmr@gmail.com" }
 ]
-keywords = ["windows", "ui-automation", "mcp", "ai-agents", "rpa", "desktop-automation"]
+keywords = ["windows", "ui-automation", "mcp", "ai-agents", "rpa", "desktop-automation", "fault-tolerant"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Win32 (MS Windows)",
@@ -44,9 +44,16 @@ dependencies = [
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
     "black>=24.0.0",
     "ruff>=0.4.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/AaradhyaDT/windows-pilot"
+Documentation = "https://github.com/AaradhyaDT/windows-pilot#readme"
+Repository = "https://github.com/AaradhyaDT/windows-pilot.git"
+Issues = "https://github.com/AaradhyaDT/windows-pilot/issues"
 
 [project.scripts]
 winpilot = "winpilot.cli:app"
@@ -54,3 +61,50 @@ winpilot-mcp = "winpilot.mcp_server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["winpilot"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501", # line length handled by formatter
+    "B008", # do not perform function calls in argument defaults (Typer Option/Argument convention)
+    "E741", # ambiguous variable name (e.g. l for left in coordinates)
+    "SIM102", # nested if statements (often clearer for logical parsing gates)
+    "SIM105", # contextlib.suppress overhead in low-level hot paths
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["winpilot"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "strict"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["winpilot"]
+omit = [
+    "tests/*",
+    "winpilot/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]

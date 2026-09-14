@@ -5,21 +5,18 @@ Claude Desktop Application Recipe: Robust UIA + Win32 automation for Claude Desk
 from __future__ import annotations
 
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
-from winpilot.compose.actions import ActionChain
-from winpilot.compose.query import Query
-from winpilot.compose.wait import wait_for_element
 from winpilot.core.input import Input
-from winpilot.core.uia import UIATree, UIElement
-from winpilot.core.window import Window, find_window, list_windows
+from winpilot.core.uia import UIATree
+from winpilot.core.window import Window, list_windows
 from winpilot.recipes.base import BaseRecipe
 
 
 class ClaudeDesktopRecipe(BaseRecipe):
     """Automation recipe for official Claude Desktop on Windows."""
 
-    def __init__(self, window_or_hwnd: Union[Window, str, int] = "Claude"):
+    def __init__(self, window_or_hwnd: Window | str | int = "Claude"):
         super().__init__(window_or_hwnd)
         self.tree = UIATree(self.window)
 
@@ -49,7 +46,7 @@ class ClaudeDesktopRecipe(BaseRecipe):
                 return btn.name
         return "Unknown"
 
-    def set_model(self, target_model: str) -> Dict[str, Any]:
+    def set_model(self, target_model: str) -> dict[str, Any]:
         """
         Attempts to change the model using UI Automation accessibility tree traversal:
         1. Finds model selector button.
@@ -142,7 +139,7 @@ class ClaudeDesktopRecipe(BaseRecipe):
         return False
 
 
-def get_all_claude_instances() -> List[ClaudeDesktopRecipe]:
+def get_all_claude_instances() -> list[ClaudeDesktopRecipe]:
     """Finds all running Claude Desktop instances and returns their recipe drivers."""
     wins = list_windows(process_name="claude.exe", visible_only=True)
     return [ClaudeDesktopRecipe(w) for w in wins]

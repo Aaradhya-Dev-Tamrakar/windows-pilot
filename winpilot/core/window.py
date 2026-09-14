@@ -5,14 +5,13 @@ Window Management Module: HWND encapsulation, discovery, foreground unlocking, a
 from __future__ import annotations
 
 import ctypes
-from ctypes import wintypes
 import os
-from pathlib import Path
 import re
 import subprocess
 import sys
 import time
-from typing import Any, List, Optional, Tuple
+from ctypes import wintypes
+from pathlib import Path
 
 if sys.platform == "win32":
     import win32con
@@ -123,7 +122,7 @@ class Window:
             return False
 
     @property
-    def rect(self) -> Tuple[int, int, int, int]:
+    def rect(self) -> tuple[int, int, int, int]:
         """Returns (left, top, right, bottom) coordinates."""
         if not self.is_valid:
             return (0, 0, 0, 0)
@@ -258,15 +257,15 @@ class Window:
 
 
 def list_windows(
-    title_regex: Optional[str] = None,
-    process_name: Optional[str] = None,
+    title_regex: str | None = None,
+    process_name: str | None = None,
     visible_only: bool = True,
-) -> List[Window]:
+) -> list[Window]:
     """Enumerate desktop windows matching title or process filters."""
     if sys.platform != "win32":
         return []
 
-    result: List[Window] = []
+    result: list[Window] = []
     pattern = re.compile(title_regex, re.IGNORECASE) if title_regex else None
 
     def _process_hwnd(hwnd: int) -> None:
@@ -320,10 +319,10 @@ def list_windows(
 
 
 def find_window(
-    title_regex: Optional[str] = None,
-    process_name: Optional[str] = None,
-    hwnd: Optional[int] = None,
-) -> Optional[Window]:
+    title_regex: str | None = None,
+    process_name: str | None = None,
+    hwnd: int | None = None,
+) -> Window | None:
     """Find a single window matching criteria."""
     if hwnd:
         w = Window(hwnd)

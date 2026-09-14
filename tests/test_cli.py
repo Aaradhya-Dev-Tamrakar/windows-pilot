@@ -1,10 +1,11 @@
 """Tests for Window and CLI commands."""
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from typer.testing import CliRunner
 
 from winpilot.cli import app
-from winpilot.core.window import Window, list_windows
+from winpilot.core.window import Window
 
 runner = CliRunner()
 

@@ -4,21 +4,20 @@ Query DSL: CSS-like selector parser and evaluator for Windows UI Automation tree
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import re
-from typing import List, Optional, Union
+from dataclasses import dataclass
 
 from winpilot.core.uia import UIATree, UIElement
 
 
 @dataclass
 class Selector:
-    control_type: Optional[str] = None
-    automation_id: Optional[str] = None
-    name_op: Optional[str] = None  # "=", "*=", "^=", "$="
-    name_val: Optional[str] = None
+    control_type: str | None = None
+    automation_id: str | None = None
+    name_op: str | None = None  # "=", "*=", "^=", "$="
+    name_val: str | None = None
     name_case_insensitive: bool = True
-    class_name: Optional[str] = None
+    class_name: str | None = None
 
     def matches(self, elem: UIElement) -> bool:
         # 1. Control type match
@@ -60,7 +59,7 @@ class Selector:
         return True
 
 
-def parse_query(query_str: str) -> List[Selector]:
+def parse_query(query_str: str) -> list[Selector]:
     """
     Parses selector strings like:
       - 'Button[Name="Sonnet 5"]'
@@ -68,7 +67,7 @@ def parse_query(query_str: str) -> List[Selector]:
       - 'Edit#input_box'
       - '.menu-item'
     """
-    selectors: List[Selector] = []
+    selectors: list[Selector] = []
     # Split on hierarchy or combinators (for MVP we support simple selectors and comma lists)
     raw_selectors = [s.strip() for s in query_str.split(",") if s.strip()]
 
@@ -121,7 +120,7 @@ class Query:
     """Evaluates a query string against a UIATree or UIElement."""
 
     @staticmethod
-    def find_all(root_or_tree: Union[UIATree, UIElement], query_str: str, max_depth: int = 8) -> List[UIElement]:
+    def find_all(root_or_tree: UIATree | UIElement, query_str: str, max_depth: int = 8) -> list[UIElement]:
         selectors = parse_query(query_str)
         if not selectors:
             return []
@@ -131,7 +130,7 @@ class Query:
         else:
             candidates = root_or_tree.descendants(depth=max_depth)
 
-        matches: List[UIElement] = []
+        matches: list[UIElement] = []
         for elem in candidates:
             # Matches if any selector in the OR-list matches
             if any(sel.matches(elem) for sel in selectors):
@@ -140,6 +139,6 @@ class Query:
         return matches
 
     @staticmethod
-    def find_one(root_or_tree: Union[UIATree, UIElement], query_str: str, max_depth: int = 8) -> Optional[UIElement]:
+    def find_one(root_or_tree: UIATree | UIElement, query_str: str, max_depth: int = 8) -> UIElement | None:
         results = Query.find_all(root_or_tree, query_str, max_depth=max_depth)
         return results[0] if results else None

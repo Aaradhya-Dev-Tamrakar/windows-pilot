@@ -7,8 +7,6 @@ from __future__ import annotations
 import base64
 import io
 from pathlib import Path
-import sys
-from typing import Optional, Tuple, Union
 
 from PIL import Image, ImageGrab
 
@@ -19,13 +17,13 @@ class Screen:
     """Provides screenshot and visual capture utilities."""
 
     @staticmethod
-    def capture_desktop(bbox: Optional[Tuple[int, int, int, int]] = None) -> Image.Image:
+    def capture_desktop(bbox: tuple[int, int, int, int] | None = None) -> Image.Image:
         """Capture the full desktop or a specific bounding box (left, top, right, bottom)."""
         attach_default_desktop()
         return ImageGrab.grab(bbox=bbox, all_screens=True)
 
     @staticmethod
-    def capture_window(window_or_hwnd: Union[Window, int]) -> Optional[Image.Image]:
+    def capture_window(window_or_hwnd: Window | int) -> Image.Image | None:
         """Capture the visual rectangle of a specific window."""
         attach_default_desktop()
         w = window_or_hwnd if isinstance(window_or_hwnd, Window) else Window(window_or_hwnd)
@@ -40,7 +38,7 @@ class Screen:
     @staticmethod
     def save(
         image: Image.Image,
-        dest_path: Union[str, Path],
+        dest_path: str | Path,
         format: str = "PNG",
     ) -> Path:
         """Save a PIL Image to disk."""

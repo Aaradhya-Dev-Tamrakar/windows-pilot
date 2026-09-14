@@ -7,14 +7,12 @@ from __future__ import annotations
 import ctypes
 import sys
 import time
-from typing import Optional, Tuple
 
 from winpilot.core.window import attach_default_desktop
 
 if sys.platform == "win32":
     import win32api
     import win32clipboard
-    import win32con
 
 # Keycode mapping table for common key names
 VK_MAP = {
@@ -191,7 +189,7 @@ class Input:
         Input.click(x, y, button="right")
 
     @staticmethod
-    def get_cursor_pos() -> Tuple[int, int]:
+    def get_cursor_pos() -> tuple[int, int]:
         attach_default_desktop()
         pt = win32api.GetCursorPos()
         return (pt[0], pt[1])

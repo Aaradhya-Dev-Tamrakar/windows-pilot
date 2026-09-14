@@ -5,7 +5,6 @@ Wait Conditions: Polling and synchronization primitives for UI element state tra
 from __future__ import annotations
 
 import time
-from typing import Optional, Union
 
 from winpilot.compose.query import Query
 from winpilot.core.uia import UIATree, UIElement
@@ -13,8 +12,8 @@ from winpilot.core.window import Window, find_window
 
 
 def wait_for_window(
-    title_regex: Optional[str] = None,
-    process_name: Optional[str] = None,
+    title_regex: str | None = None,
+    process_name: str | None = None,
     timeout: float = 10.0,
     poll_interval: float = 0.3,
 ) -> Window:
@@ -29,7 +28,7 @@ def wait_for_window(
 
 
 def wait_for_element(
-    tree_or_window: Union[UIATree, Window, UIElement],
+    tree_or_window: UIATree | Window | UIElement,
     query_str: str,
     timeout: float = 5.0,
     poll_interval: float = 0.2,
@@ -47,7 +46,7 @@ def wait_for_element(
 
 
 def wait_until_gone(
-    tree_or_window: Union[UIATree, Window, UIElement],
+    tree_or_window: UIATree | Window | UIElement,
     query_str: str,
     timeout: float = 5.0,
     poll_interval: float = 0.2,

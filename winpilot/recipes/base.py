@@ -5,7 +5,6 @@ Base Application Recipe: Abstract template for app-specific automation workflows
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Union
 
 from winpilot.core.window import Window, find_window
 
@@ -13,7 +12,7 @@ from winpilot.core.window import Window, find_window
 class BaseRecipe(ABC):
     """Abstract base class for application recipes."""
 
-    def __init__(self, window_or_title: Union[Window, str, int]):
+    def __init__(self, window_or_title: Window | str | int):
         if isinstance(window_or_title, Window):
             self.window = window_or_title
         elif isinstance(window_or_title, int):

@@ -5,10 +5,8 @@ WinPilot Command Line Interface (CLI): Human-facing terminal controls with Rich 
 from __future__ import annotations
 
 import json
-from pathlib import Path
-from typing import Optional
-
 import sys
+from pathlib import Path
 
 if sys.platform == "win32":
     try:
@@ -19,10 +17,10 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+import typer
 from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
-import typer
 
 from winpilot.compose.query import Query
 from winpilot.core.input import Input
@@ -56,8 +54,8 @@ def _resolve_window(hwnd_or_title: str) -> Window:
 @app.command("list")
 @app.command("list-windows")
 def list_cmd(
-    filter: Optional[str] = typer.Option(None, "--filter", "-f", help="Regex filter for window title"),
-    process: Optional[str] = typer.Option(None, "--process", "-p", help="Filter by process name (e.g. claude.exe)"),
+    filter: str | None = typer.Option(None, "--filter", "-f", help="Regex filter for window title"),
+    process: str | None = typer.Option(None, "--process", "-p", help="Filter by process name (e.g. claude.exe)"),
     all: bool = typer.Option(False, "--all", "-a", help="Include invisible windows"),
 ):
     """List open Windows top-level windows."""
@@ -165,7 +163,7 @@ def paste_cmd(
 
 @app.command("screenshot")
 def screenshot_cmd(
-    window: Optional[str] = typer.Option(None, "--window", "-w", help="Window title or HWND (defaults to full screen)"),
+    window: str | None = typer.Option(None, "--window", "-w", help="Window title or HWND (defaults to full screen)"),
     output: Path = typer.Option(Path("screenshot.png"), "--output", "-o", help="Output PNG path"),
 ):
     """Capture a screenshot of a window or desktop."""
