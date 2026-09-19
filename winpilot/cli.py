@@ -311,5 +311,45 @@ def recipe_claude_prompt(
     console.print(f"[bold green]✓ Prompt dispatched to Claude: {ok}[/]")
 
 
+@recipe_app.command("claude-thinking")
+def recipe_claude_thinking(
+    target: str = typer.Option("Claude", "--target", "-t", help="Target window title or HWND"),
+):
+    """Toggle thinking on/off in Claude Desktop via Ctrl+Shift+E."""
+    recipe = ClaudeDesktopRecipe(target)
+    res = recipe.toggle_thinking()
+    console.print(f"[bold green]✓ {res.get('message')}[/]")
+
+
+@recipe_app.command("claude-effort")
+def recipe_claude_effort(
+    effort: str = typer.Option("medium", "--effort", "-e", help="Target effort: low, medium, high, extra, max"),
+    target: str = typer.Option("Claude", "--target", "-t", help="Target window title or HWND"),
+):
+    """Set the response effort level in Claude Desktop."""
+    recipe = ClaudeDesktopRecipe(target)
+    console.print(f"[*] Setting effort to '[bold cyan]{effort}[/]' in Claude Desktop...")
+    res = recipe.set_effort(effort)
+    if res.get("success"):
+        console.print(f"[bold green]✓ {res.get('message')}[/]")
+    else:
+        console.print(f"[bold red]✗ {res.get('error')}[/]")
+
+
+@recipe_app.command("claude-cooldown")
+def recipe_claude_cooldown(
+    target: str = typer.Option("Claude", "--target", "-t", help="Target window title or HWND"),
+):
+    """Check if Claude Desktop is in cooldown and extract reset timestamp."""
+    recipe = ClaudeDesktopRecipe(target)
+    cd = recipe.detect_cooldown()
+    if cd["in_cooldown"]:
+        console.print(f"[bold red]✗ Cooldown active! Reset time: {cd['reset_time']}[/] (Banner: {cd['banner_text']})")
+    elif cd["warning_90_pct"]:
+        console.print(f"[bold yellow]⚠ Warning: Approaching limit! (Banner: {cd['banner_text']})[/]")
+    else:
+        console.print("[bold green]✓ No cooldown detected. Worker ready.[/]")
+
+
 if __name__ == "__main__":
     app()
