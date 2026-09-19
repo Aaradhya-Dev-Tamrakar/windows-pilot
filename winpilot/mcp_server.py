@@ -196,6 +196,12 @@ def run_recipe(recipe_name: str, action: str, target: str = "Claude", params_jso
         if action == "set_model":
             res = recipe.set_model(params.get("model", "haiku"))
             return json.dumps(res, indent=2)
+        elif action == "set_effort":
+            res = recipe.set_effort(params.get("effort", "medium"))
+            return json.dumps(res, indent=2)
+        elif action == "toggle_thinking":
+            res = recipe.toggle_thinking()
+            return json.dumps(res, indent=2)
         elif action == "send_prompt":
             ok = recipe.send_prompt(params.get("prompt", ""), submit=params.get("submit", True))
             return f"Prompt sent: {ok}"
@@ -207,7 +213,7 @@ def run_recipe(recipe_name: str, action: str, target: str = "Claude", params_jso
             return f"Active model: {m}"
         elif action == "detect_cooldown":
             cd = recipe.detect_cooldown()
-            return f"Cooldown detected: {cd}"
+            return json.dumps(cd, indent=2)
         else:
             return f"Unknown action: {action}"
 

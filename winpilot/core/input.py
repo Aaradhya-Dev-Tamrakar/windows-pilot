@@ -50,6 +50,12 @@ VK_MAP = {
     "f10": 0x79,
     "f11": 0x7A,
     "f12": 0x7B,
+    ".": 0xBE,
+    "period": 0xBE,
+    ",": 0xBC,
+    "comma": 0xBC,
+    "/": 0xBF,
+    "slash": 0xBF,
 }
 
 
