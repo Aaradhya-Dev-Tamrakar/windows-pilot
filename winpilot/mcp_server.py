@@ -113,8 +113,13 @@ def send_keys(keys_combo: str) -> str:
 
 
 @mcp.tool()
-def capture_screenshot(hwnd_or_title: str | None = None) -> str:
-    """Capture a screenshot of a window or full desktop and return base64 encoded PNG."""
+def capture_screenshot(
+    hwnd_or_title: str | None = None,
+    output_path: str | None = None,
+) -> str:
+    """Capture a screenshot of a window or full desktop.
+    If output_path is provided, saves directly to disk. Also returns metadata and base64 PNG.
+    """
     if hwnd_or_title:
         if hwnd_or_title.isdigit():
             w = Window(int(hwnd_or_title))
@@ -128,6 +133,13 @@ def capture_screenshot(hwnd_or_title: str | None = None) -> str:
 
     if not img:
         return "Error: Failed to capture screenshot."
+
+    saved_file: str | None = None
+    if output_path:
+        saved = Screen.save(img, output_path)
+        saved_file = str(saved)
+        meta.file_path = saved
+
     return json.dumps({
         "status": "success",
         "target_type": meta.target_type,
@@ -137,6 +149,7 @@ def capture_screenshot(hwnd_or_title: str | None = None) -> str:
         "process_name": meta.process_name,
         "resolution": meta.dimensions,
         "engine": meta.engine,
+        "saved_path": saved_file,
         "base64_png": Screen.to_base64(img),
     })
 
